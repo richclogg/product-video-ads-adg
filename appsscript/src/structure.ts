@@ -215,11 +215,7 @@ export const tableStructure: Partial<Record<SheetName, ColumnName[]>> = {
     ColumnName.textColor,
     ColumnName.removeBackground,
   ],
-  [SheetName.offers]: [
-    ColumnName.offerId,
-    ColumnName.zoomEffect,
-    ColumnName.zoomAmount,
-  ],
+  [SheetName.offers]: [ColumnName.offerId],
   [SheetName.offersToAdGroups]: [ColumnName.offerId, ColumnName.adGroup],
   [SheetName.adGroups]: [
     // If changed, reflect in Ads Script!

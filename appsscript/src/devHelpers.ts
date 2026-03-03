@@ -43,7 +43,7 @@ export function populateConfig() {
   const configFields: [ConfigGroup, ConfigField, string][] = [
     [ConfigGroup.merchantCenter, ConfigField.filterFeed, 'only mapped'],
   ];
-  const offerFields = [ColumnName.offerId, 'Title', 'Image', 'Price'];
+  const offerFields = [ColumnName.offerId, 'Title', 'Image', 'Price', ColumnName.zoomEffect, ColumnName.zoomAmount];
   const configContent = {
     [SheetName.timing]: [
       ['template.mp4', 11, 4, 1],
@@ -99,52 +99,44 @@ export function populateConfig() {
     ],
     [SheetName.offers]: [
       [
-        1001,
-        'Apples',
+        1001, 'Apples',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/apples.png',
-        '€1.09',
+        '€1.09', 'in', 1.3,
       ],
       [
-        1002,
-        'Bananas',
+        1002, 'Bananas',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/bananas.png',
-        '€2.09',
+        '€2.09', '', '',
       ],
       [
-        1003,
-        'Broccoli',
+        1003, 'Broccoli',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/broccoli.png',
-        '€1.59',
+        '€1.59', 'out', 1.2,
       ],
       [
-        1004,
-        'Oranges',
+        1004, 'Oranges',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/oranges.png',
-        '€1.29',
+        '€1.29', 'in', 1.3,
       ],
       [
-        1005,
-        'Papayas',
+        1005, 'Papayas',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/papayas.png',
-        '€2.29',
+        '€2.29', '', '',
       ],
       [
-        1006,
-        'Watermelon',
+        1006, 'Watermelon',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/watermelon.png',
-        '€2.89',
+        '€2.89', 'in', 1.3,
       ],
       [
-        1007,
-        'Pineapple',
+        1007, 'Pineapple',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/pineapple.png',
-        '€1.49',
+        '€1.49', '', '',
       ],
       [
-        1008,
-        'Dragonfruits',
+        1008, 'Dragonfruits',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/dragonfruits.png',
-        '€1.99',
+        '€1.99', 'out', 1.2,
       ],
     ],
     [SheetName.offersToAdGroups]: [

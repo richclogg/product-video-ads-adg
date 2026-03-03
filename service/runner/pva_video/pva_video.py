@@ -207,24 +207,28 @@ def video_filter(
     base_h = int(float(height))
 
     za = float(zoom_amount)
-    if zoom_effect == 'in':
-      start_s, end_s = 1.0, za
-    else:
-      start_s, end_s = za, 1.0
 
-    # Fixed canvas = max zoom size (even dims, constant overlay size = no jitter)
+    # Fixed canvas = max zoom size (even dims, constant overlay = no jitter)
     canvas_w = int(base_w * za) + (int(base_w * za) % 2)
     canvas_h = int(base_h * za) + (int(base_h * za) % 2)
 
-    # Scale factor interpolated over frames: start_s → end_s
-    sf = f"({start_s}+({end_s}-{start_s})*min(n/{total_frames},1))"
-    w_expr = f"{base_w}*{sf}"
-    h_expr = f"{base_h}*{sf}"
+    # zoompan z: 1 = full padded canvas (image at base size),
+    #            za = zoomed to center (image fills canvas)
+    if zoom_effect == 'in':
+      z_expr = f"min({za},1+({za}-1)*on/{total_frames})"
+    else:
+      z_expr = f"max(1,{za}-({za}-1)*on/{total_frames})"
 
+    # Center-locked pan
+    x_expr = "iw/2-(iw/zoom/2)"
+    y_expr = "ih/2-(ih/zoom/2)"
+
+    # Pad source to canvas size, then zoompan within it (fixed output dims)
     img = (
         f"{image_str} format=rgba,"
-        f"scale=w='{w_expr}':h='{h_expr}':eval=frame:flags=lanczos,"
-        f"pad={canvas_w}:{canvas_h}:(ow-iw)/2:(oh-ih)/2:color=black@0:eval=frame "
+        f"pad={canvas_w}:{canvas_h}:({canvas_w}-iw)/2:({canvas_h}-ih)/2:color=black@0,"
+        f"zoompan=z='{z_expr}':x='{x_expr}':y='{y_expr}':"
+        f"d={total_frames}:s={canvas_w}x{canvas_h}:fps=25 "
         f"{resize_str};"
     )
 

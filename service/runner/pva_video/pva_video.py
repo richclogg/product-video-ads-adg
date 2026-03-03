@@ -199,30 +199,32 @@ def video_filter(
     height = '-1'
   # raise Exception(fade_effect)
 
-  # Animated zoom (Ken Burns effect) — replaces static scale
-  if zoom_effect and zoom_effect in ('in', 'out'):
+  # Animated zoom — scales the whole image overlay larger/smaller over time
+  if zoom_effect and zoom_effect in ('in', 'out') and width != '-1' and height != '-1':
     duration_s = float(t_end) - float(t_start)
     total_frames = max(1, int(duration_s * 25))  # 25 fps
+    base_w = int(float(width))
+    base_h = int(float(height))
 
     if zoom_effect == 'in':
-      z_expr = f"min({zoom_amount},1+({zoom_amount}-1)*on/{total_frames})"
+      start_s, end_s = 1.0, float(zoom_amount)
     else:
-      z_expr = f"max(1,{zoom_amount}-({zoom_amount}-1)*on/{total_frames})"
+      start_s, end_s = float(zoom_amount), 1.0
 
-    # Center-locked pan
-    x_expr = "iw/2-(iw/zoom/2)"
-    y_expr = "ih/2-(ih/zoom/2)"
-
-    # Ensure even dimensions (ffmpeg requirement)
-    zp_w = int(float(width)) + (int(float(width)) % 2) if width != '-1' else 1920
-    zp_h = int(float(height)) + (int(float(height)) % 2) if height != '-1' else 1080
+    # Scale factor interpolated over frames: start_s → end_s
+    sf = f"({start_s}+({end_s}-{start_s})*min(n/{total_frames},1))"
+    w_expr = f"trunc({base_w}*{sf}/2)*2"
+    h_expr = f"trunc({base_h}*{sf}/2)*2"
 
     img = (
         f"{image_str} format=rgba,"
-        f"zoompan=z='{z_expr}':x='{x_expr}':y='{y_expr}':"
-        f"d={total_frames}:s={zp_w}x{zp_h}:fps=25 "
+        f"scale=w='{w_expr}':h='{h_expr}':eval=frame "
         f"{resize_str};"
     )
+
+    # Adjust overlay position so image stays centered as it grows/shrinks
+    x = f"({x})+{base_w}/2-overlay_w/2"
+    y = f"({y})+{base_h}/2-overlay_h/2"
   # Keep aspect ratio
   elif keep_ratio:
     img = '%s format=rgba,scale=%s %s;' % (

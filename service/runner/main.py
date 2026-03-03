@@ -321,11 +321,10 @@ def _get_text_dimensions(
   # To get a consistent and accurate height, we query ImageMagick for font
   # metrics. This is more reliable than rendering text to an image and
   # measuring it, which can include unwanted vertical padding (leading).
-  args_metric = [
-      'convert',
-      'xc:none',
-      '-font',
-      font_path,
+  args_metric = ['convert', 'xc:none']
+  if font_path:
+    args_metric += ['-font', font_path]
+  args_metric += [
       '-pointsize',
       str(placement.text_size),
       '-debug',

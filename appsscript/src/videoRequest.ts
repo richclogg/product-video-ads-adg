@@ -48,16 +48,8 @@ const elementPropertyConfig = {
     },
   },
   [ElementType.image]: {
-    stringProps: [
-      ColumnName.removeBackground,
-      ColumnName.keepRatio,
-      ColumnName.zoomEffect,
-    ],
-    floatProps: [
-      ColumnName.imageWidth,
-      ColumnName.imageHeight,
-      ColumnName.zoomAmount,
-    ],
+    stringProps: [ColumnName.removeBackground, ColumnName.keepRatio],
+    floatProps: [ColumnName.imageWidth, ColumnName.imageHeight],
     specialValue: {
       key: JsonFieldName.imageUrl,
       source: 'offer',
@@ -120,6 +112,16 @@ function getPlacement(
   for (const prop of config.floatProps) {
     placement[Util.deriveFieldKey(prop)] =
       parseFloat(placementRecord[prop]) || 0;
+  }
+
+  // Pull zoom settings from offer (images only)
+  if (elementType === ElementType.image) {
+    if (offer['Zoom Effect']) {
+      placement['zoom_effect'] = offer['Zoom Effect'];
+    }
+    if (offer['Zoom Amount']) {
+      placement['zoom_amount'] = parseFloat(offer['Zoom Amount']) || 0;
+    }
   }
 
   return [placement, undefined];

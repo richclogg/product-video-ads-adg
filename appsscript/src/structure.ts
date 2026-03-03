@@ -256,7 +256,12 @@ export const columnsConditionallyOmittable: Partial<
 > = {
   [SheetName.placement]: {
     [ColumnName.elementType]: {
-      [ElementType.text]: [ColumnName.imageWidth, ColumnName.imageHeight, ColumnName.zoomEffect, ColumnName.zoomAmount],
+      [ElementType.text]: [
+        ColumnName.imageWidth,
+        ColumnName.imageHeight,
+        ColumnName.zoomEffect,
+        ColumnName.zoomAmount,
+      ],
       [ElementType.image]: [
         ColumnName.textFont,
         ColumnName.textSize,

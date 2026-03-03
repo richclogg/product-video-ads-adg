@@ -218,7 +218,7 @@ def video_filter(
 
     img = (
         f"{image_str} format=rgba,"
-        f"scale=w='{w_expr}':h='{h_expr}':eval=frame "
+        f"scale=w='{w_expr}':h='{h_expr}':eval=frame:flags=lanczos "
         f"{resize_str};"
     )
 

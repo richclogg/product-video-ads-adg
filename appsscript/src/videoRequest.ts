@@ -116,11 +116,13 @@ function getPlacement(
 
   // Pull zoom settings from offer (images only)
   if (elementType === ElementType.image) {
-    if (offer['Zoom Effect']) {
-      placement['zoom_effect'] = offer['Zoom Effect'];
+    if (offer[ColumnName.zoomEffect]) {
+      placement[Util.deriveFieldKey(ColumnName.zoomEffect)] =
+        offer[ColumnName.zoomEffect];
     }
-    if (offer['Zoom Amount']) {
-      placement['zoom_amount'] = parseFloat(offer['Zoom Amount']) || 0;
+    if (offer[ColumnName.zoomAmount]) {
+      placement[Util.deriveFieldKey(ColumnName.zoomAmount)] =
+        parseFloat(offer[ColumnName.zoomAmount]) || 0;
     }
   }
 

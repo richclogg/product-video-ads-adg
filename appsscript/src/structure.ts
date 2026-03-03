@@ -51,6 +51,8 @@ export enum ColumnName {
   imageHeight = 'Image Height',
   keepRatio = 'Keep Image Ratio',
   removeBackground = 'Remove Background',
+  zoomEffect = 'Zoom Effect',
+  zoomAmount = 'Zoom Amount',
   offerId = 'Offer ID',
   offsetS = 'Offset [s]',
   outputVideoId = 'Output Video ID',
@@ -213,7 +215,11 @@ export const tableStructure: Partial<Record<SheetName, ColumnName[]>> = {
     ColumnName.textColor,
     ColumnName.removeBackground,
   ],
-  [SheetName.offers]: [ColumnName.offerId],
+  [SheetName.offers]: [
+    ColumnName.offerId,
+    ColumnName.zoomEffect,
+    ColumnName.zoomAmount,
+  ],
   [SheetName.offersToAdGroups]: [ColumnName.offerId, ColumnName.adGroup],
   [SheetName.adGroups]: [
     // If changed, reflect in Ads Script!
@@ -252,10 +258,7 @@ export const columnsConditionallyOmittable: Partial<
 > = {
   [SheetName.placement]: {
     [ColumnName.elementType]: {
-      [ElementType.text]: [
-        ColumnName.imageWidth,
-        ColumnName.imageHeight,
-      ],
+      [ElementType.text]: [ColumnName.imageWidth, ColumnName.imageHeight],
       [ElementType.image]: [
         ColumnName.textFont,
         ColumnName.textSize,
@@ -291,6 +294,7 @@ export class ValueRestrictions {
       ValueRestrictionType.enum,
       ['Yes', 'No', ''],
     ],
+    [ColumnName.zoomEffect]: [ValueRestrictionType.enum, ['in', 'out', '']],
     [ColumnName.elementHorizontalAnchor]: [
       ValueRestrictionType.enum,
       ['left', 'center', 'right', ''],
@@ -320,6 +324,7 @@ export class ValueRestrictions {
     [ColumnName.textSize, 1, 1000],
     [ColumnName.textWidth, 1, 1e5],
     [ColumnName.rotationAngle, 0, 360],
+    [ColumnName.zoomAmount, 1, 3],
   ];
 
   constructor() {

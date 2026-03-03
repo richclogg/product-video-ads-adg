@@ -206,25 +206,31 @@ def video_filter(
     base_w = int(float(width))
     base_h = int(float(height))
 
+    za = float(zoom_amount)
     if zoom_effect == 'in':
-      start_s, end_s = 1.0, float(zoom_amount)
+      start_s, end_s = 1.0, za
     else:
-      start_s, end_s = float(zoom_amount), 1.0
+      start_s, end_s = za, 1.0
+
+    # Fixed canvas = max zoom size (even dims, constant overlay size = no jitter)
+    canvas_w = int(base_w * za) + (int(base_w * za) % 2)
+    canvas_h = int(base_h * za) + (int(base_h * za) % 2)
 
     # Scale factor interpolated over frames: start_s → end_s
     sf = f"({start_s}+({end_s}-{start_s})*min(n/{total_frames},1))"
-    w_expr = f"trunc({base_w}*{sf}/2)*2"
-    h_expr = f"trunc({base_h}*{sf}/2)*2"
+    w_expr = f"{base_w}*{sf}"
+    h_expr = f"{base_h}*{sf}"
 
     img = (
         f"{image_str} format=rgba,"
-        f"scale=w='{w_expr}':h='{h_expr}':eval=frame:flags=lanczos "
+        f"scale=w='{w_expr}':h='{h_expr}':eval=frame:flags=lanczos,"
+        f"pad={canvas_w}:{canvas_h}:(ow-iw)/2:(oh-ih)/2:color=black@0:eval=frame "
         f"{resize_str};"
     )
 
-    # Adjust overlay position so image stays centered as it grows/shrinks
-    x = f"({x})+{base_w}/2-overlay_w/2"
-    y = f"({y})+{base_h}/2-overlay_h/2"
+    # Fixed overlay position — canvas never changes size
+    x = f"({x})+{base_w}/2-{canvas_w}/2"
+    y = f"({y})+{base_h}/2-{canvas_h}/2"
   # Keep aspect ratio
   elif keep_ratio:
     img = '%s format=rgba,scale=%s %s;' % (

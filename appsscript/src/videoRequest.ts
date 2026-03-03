@@ -48,8 +48,8 @@ const elementPropertyConfig = {
     },
   },
   [ElementType.image]: {
-    stringProps: [ColumnName.removeBackground, ColumnName.keepRatio],
-    floatProps: [ColumnName.imageWidth, ColumnName.imageHeight],
+    stringProps: [ColumnName.removeBackground, ColumnName.keepRatio, ColumnName.zoomEffect],
+    floatProps: [ColumnName.imageWidth, ColumnName.imageHeight, ColumnName.zoomAmount],
     specialValue: {
       key: JsonFieldName.imageUrl,
       source: 'offer',

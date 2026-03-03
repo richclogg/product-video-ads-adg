@@ -173,6 +173,8 @@ class PvaLiteRenderMessageImagePlacement(PvaLiteRenderMessagePlacement):
   image_height: Optional[float] = 0
   remove_background: Optional[str] = 'No'
   keep_ratio: Optional[bool] = False
+  zoom_effect: Optional[str] = None    # 'in', 'out', or None (no zoom)
+  zoom_amount: Optional[float] = 1.3   # peak zoom factor (e.g., 1.3 = 30%)
 
   def __init__(self, **kwargs):
     # Handle string value 'Yes'/'No' from the sheet for keep_ratio.
@@ -190,7 +192,9 @@ class PvaLiteRenderMessageImagePlacement(PvaLiteRenderMessagePlacement):
         f'image_width={self.image_width}, '
         f'image_height={self.image_height}, '
         f'keep_ratio={self.keep_ratio})'
-        f'remove_background={self.remove_background}'
+        f'remove_background={self.remove_background}, '
+        f'zoom_effect={self.zoom_effect}, '
+        f'zoom_amount={self.zoom_amount}'
     )
 
 
@@ -750,6 +754,8 @@ def convert_image_overlay(
       'angle': placement.rotation_angle,
       'image': tmp_file_name,
       'keep_ratio': placement.keep_ratio,
+      'zoom_effect': placement.zoom_effect,
+      'zoom_amount': placement.zoom_amount,
       'start_time': offset,
       'end_time': offset + duration,
   }

@@ -71,7 +71,8 @@ def filter_strings(images_and_videos, text_lines):
                 '-1'), ovr['start_time'], ovr['end_time'], output_stream,
         (ovr.get('angle', None) if not angle_already_used else None),
         ovr.get('fade_in_duration', 0.1), ovr.get('fade_out_duration', 0.1),
-        ovr.get('align', None), ovr.get('keep_ratio', None)
+        ovr.get('align', None), ovr.get('keep_ratio', None),
+        ovr.get('zoom_effect', None), ovr.get('zoom_amount', 1.3),
     )
     retval.append(f)
 
@@ -164,6 +165,8 @@ def video_filter(
     fade_out_duration,
     align,
     keep_ratio,
+    zoom_effect=None,
+    zoom_amount=1.3,
 ):
   """Generates a ffmpeg filter specification for an image input.
 
@@ -196,8 +199,32 @@ def video_filter(
     height = '-1'
   # raise Exception(fade_effect)
 
+  # Animated zoom (Ken Burns effect) — replaces static scale
+  if zoom_effect and zoom_effect in ('in', 'out'):
+    duration_s = float(t_end) - float(t_start)
+    total_frames = max(1, int(duration_s * 25))  # 25 fps
+
+    if zoom_effect == 'in':
+      z_expr = f"min({zoom_amount},1+({zoom_amount}-1)*on/{total_frames})"
+    else:
+      z_expr = f"max(1,{zoom_amount}-({zoom_amount}-1)*on/{total_frames})"
+
+    # Center-locked pan
+    x_expr = "iw/2-(iw/zoom/2)"
+    y_expr = "ih/2-(ih/zoom/2)"
+
+    # Ensure even dimensions (ffmpeg requirement)
+    zp_w = int(float(width)) + (int(float(width)) % 2) if width != '-1' else 1920
+    zp_h = int(float(height)) + (int(float(height)) % 2) if height != '-1' else 1080
+
+    img = (
+        f"{image_str} format=rgba,"
+        f"zoompan=z='{z_expr}':x='{x_expr}':y='{y_expr}':"
+        f"d={total_frames}:s={zp_w}x{zp_h}:fps=25 "
+        f"{resize_str};"
+    )
   # Keep aspect ratio
-  if keep_ratio:
+  elif keep_ratio:
     img = '%s format=rgba,scale=%s %s;' % (
         image_str, "'if(gt(a,w/h),w,-1)':'if(gt(a,w/h),-1,h)'".
         replace('w', str(width)).replace('h', str(height)), resize_str

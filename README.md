@@ -222,6 +222,8 @@ All columns need to have values, except _Text Font_ and those referring to a dif
 - _Rotation Angle_: angle (in degrees) at which to rotate the content, positive values meaning clockwise rotation
 - _Image Width_ and _Image Height_: dimensions into which the image should be scaled
   _Keep Image Ratio_: If yes, the aspect ratio will be retained, otherwise image will be scaled to provided width and height.
+- _Zoom Effect_ (optional): animated Ken Burns zoom – `in` zooms from 100% to the zoom amount, `out` zooms from the zoom amount down to 100%. Leave empty for no zoom.
+- _Zoom Amount_ (optional): peak zoom factor when using Zoom Effect, e.g. `1.3` means 30% zoom. Valid range: 1–3. Defaults to 1.3 if omitted.
 - _Text Font_ (optional): font filename (including its extension)
 - _Text Size_: vertical size in pixels
 - _Text Width_: maximum characters after which the text should be wrapped using a line break

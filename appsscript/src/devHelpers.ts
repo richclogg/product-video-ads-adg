@@ -43,100 +43,117 @@ export function populateConfig() {
   const configFields: [ConfigGroup, ConfigField, string][] = [
     [ConfigGroup.merchantCenter, ConfigField.filterFeed, 'only mapped'],
   ];
-  const offerFields = [ColumnName.offerId, 'Title', 'Image', 'Price', ColumnName.zoomEffect, ColumnName.zoomAmount];
+  const offerFields = [
+    ColumnName.offerId,
+    'Title',
+    'Image',
+    'Price',
+    ColumnName.zoomEffect,
+    ColumnName.zoomAmount,
+  ];
   const configContent = {
     [SheetName.timing]: [
       ['template.mp4', 11, 4, 1],
       ['template.mp4', 15, 5, 1],
       ['template.mp4', 20, 4, 1],
     ],
+    // Columns: placementId, elementId, elementType, dataField,
+    //   relativeTo, elementHorizontalAnchor, elementVerticalAnchor,
+    //   relativeHorizontalAnchor, relativeVerticalAnchor,
+    //   offsetX, offsetY, rotationAngle,
+    //   imageWidth, imageHeight, keepRatio,
+    //   textFont, textSize, textWidth, textAlignment, textColor,
+    //   removeBackground
     [SheetName.placement]: [
       [
-        1,
-        ElementType.text,
-        'Price',
-        1050,
-        280,
-        0,
-        '',
-        '',
-        '',
-        100,
-        400,
-        'left',
-        '#0088ff',
-      ],
-      [
-        1,
-        ElementType.image,
-        'Image',
-        750,
-        600,
-        0,
-        1000,
-        1000,
-        '',
-        '',
-        '',
-        '',
+        1, 'price_text', ElementType.text, 'Price',
+        '', '', '', '', '',
+        1050, 280, 0,
+        '', '', '',
+        '', 100, 400, 'left', '#0088ff',
         '',
       ],
       [
-        1,
-        ElementType.text,
-        'Title',
-        60,
-        50,
-        0,
+        1, 'product_image', ElementType.image, 'Image',
+        '', '', '', '', '',
+        750, 600, 0,
+        1000, 1000, '',
+        '', '', '', '', '',
         '',
+      ],
+      [
+        1, 'title_text', ElementType.text, 'Title',
+        '', '', '', '', '',
+        60, 50, 0,
+        '', '', '',
+        '', 120, 400, 'left', '#ff8800',
         '',
-        '',
-        120,
-        400,
-        'left',
-        '#ff8800',
       ],
     ],
     [SheetName.offers]: [
       [
-        1001, 'Apples',
+        1001,
+        'Apples',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/apples.png',
-        '€1.09', 'in', 1.3,
+        '€1.09',
+        'in',
+        1.3,
       ],
       [
-        1002, 'Bananas',
+        1002,
+        'Bananas',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/bananas.png',
-        '€2.09', '', '',
+        '€2.09',
+        '',
+        '',
       ],
       [
-        1003, 'Broccoli',
+        1003,
+        'Broccoli',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/broccoli.png',
-        '€1.59', 'out', 1.2,
+        '€1.59',
+        'out',
+        1.2,
       ],
       [
-        1004, 'Oranges',
+        1004,
+        'Oranges',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/oranges.png',
-        '€1.29', 'in', 1.3,
+        '€1.29',
+        'in',
+        1.3,
       ],
       [
-        1005, 'Papayas',
+        1005,
+        'Papayas',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/papayas.png',
-        '€2.29', '', '',
+        '€2.29',
+        '',
+        '',
       ],
       [
-        1006, 'Watermelon',
+        1006,
+        'Watermelon',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/watermelon.png',
-        '€2.89', 'in', 1.3,
+        '€2.89',
+        'in',
+        1.3,
       ],
       [
-        1007, 'Pineapple',
+        1007,
+        'Pineapple',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/pineapple.png',
-        '€1.49', '', '',
+        '€1.49',
+        '',
+        '',
       ],
       [
-        1008, 'Dragonfruits',
+        1008,
+        'Dragonfruits',
         'https://raw.githubusercontent.com/google/product_video_ads/main/example_assets/dragonfruits.png',
-        '€1.99', 'out', 1.2,
+        '€1.99',
+        'out',
+        1.2,
       ],
     ],
     [SheetName.offersToAdGroups]: [
@@ -180,6 +197,33 @@ export function populateConfig() {
   }
   const offerSheet = sheets.spreadsheet.getSheetByName(SheetName.offers)!;
   offerSheet.getRange(1, 1, 1, offerFields.length).setValues([offerFields]);
+
+  // Set data validation for zoom columns on the Offers sheet
+  const zoomEffectCol = offerFields.indexOf(ColumnName.zoomEffect) + 1;
+  const zoomAmountCol = offerFields.indexOf(ColumnName.zoomAmount) + 1;
+  if (zoomEffectCol > 0) {
+    const col = String.fromCharCode(64 + zoomEffectCol);
+    offerSheet
+      .getRange(`${col}2:${col}`)
+      .setDataValidation(
+        SpreadsheetApp.newDataValidation()
+          .requireValueInList(['in', 'out', ''], true)
+          .setAllowInvalid(false)
+          .build()
+      );
+  }
+  if (zoomAmountCol > 0) {
+    const col = String.fromCharCode(64 + zoomAmountCol);
+    offerSheet
+      .getRange(`${col}2:${col}`)
+      .setDataValidation(
+        SpreadsheetApp.newDataValidation()
+          .requireNumberBetween(1, 3)
+          .setAllowInvalid(false)
+          .build()
+      );
+  }
+
   for (const [sheetName, values] of Object.entries(configContent)) {
     const sheet = sheets.spreadsheet.getSheetByName(sheetName)!;
     sheets.clearData(sheet);

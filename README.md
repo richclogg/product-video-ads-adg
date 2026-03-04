@@ -73,6 +73,15 @@ By default, YouTube allows at most six API-based uploads per day – resulting 
 
 ## Deployment
 
+PVA has two independent frontends. You can deploy either or both:
+
+- **Google Sheets + Apps Script** (original) — follow sections A–G below
+- **React Web App** — skip to [Web App](#web-app-alternative-frontend) (self-contained, no Google Sheets setup needed)
+
+Both produce the same `config.json` and use the same GCS bucket, orchestrator, and runner. The backend services (section C's `deploy-service`) are needed regardless of which frontend you use.
+
+### Google Sheets Frontend
+
 Before being able to use PVA, the following steps are required:
 
 ### A. Prepare your deployment environment
@@ -165,10 +174,20 @@ Once everything is set up, refer to the section [Regular Usage](#regular-usage) 
 
 In addition to the Google Sheets frontend, PVA includes a React web app (`web/`) that produces the exact same `config.json` and uploads it to the same GCS bucket. Both frontends coexist — the backend doesn't know or care which one uploaded the config.
 
+The web app is **fully self-contained** in the `web/` directory with its own dependencies. You do not need Google Sheets, Apps Script, or `clasp` to use it. You only need the backend services (orchestrator + runner) deployed — see [Deployment](#deployment) section C.
+
+### Web App Quick Deploy
+
+From the repo root, you can deploy the web app in one command (after completing steps 1–3 below):
+
+```bash
+npm run deploy-web
+```
+
 ### Web App Prerequisites
 
 - Node.js >= 20
-- A Firebase project (can reuse the existing GCP project `adg-internal-tech-sandbox`)
+- A Firebase project (can reuse the existing GCP project)
 - Firebase CLI: `npm install -g firebase-tools`
 
 ### Web App Setup

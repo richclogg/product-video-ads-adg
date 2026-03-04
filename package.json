@@ -16,6 +16,7 @@
     "update-app": "npm run build && node dist/update.js",
     "deploy-appsscript": "cd appsscript && npm run deploy",
     "deploy-service": "cd service && bash deploy.sh",
+    "deploy-web": "cd web && npm install && cd functions && npm install && cd .. && npm run build && firebase deploy --only hosting,functions,firestore:rules",
     "postinstall": "cd appsscript && npm install"
   },
   "engines": {

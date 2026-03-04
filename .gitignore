@@ -11,3 +11,4 @@ service/deploy-config.sh
 .venv/
 .vscode/
 .config.json
+firebase-debug.log

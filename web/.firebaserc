@@ -1,5 +1,7 @@
 {
   "projects": {
     "default": "adg-internal-tech-sandbox"
-  }
+  },
+  "targets": {},
+  "etags": {}
 }

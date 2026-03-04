@@ -21,6 +21,7 @@ Disclaimer: This is not an officially supported Google product.
 [Purpose](#purpose) •
 [Requirements](#requirements) •
 [Deployment](#deployment) •
+[Web App](#web-app-alternative-frontend) •
 [Configuration](#configuration) •
 [Regular Usage](#regular-usage) •
 [Architecture](#architecture) •
@@ -159,6 +160,118 @@ For the actual upload, you have two main choices:
 What to enter is described in detail in the section [Configuration](#configuration).
 
 Once everything is set up, refer to the section [Regular Usage](#regular-usage) on next steps.
+
+## Web App (Alternative Frontend)
+
+In addition to the Google Sheets frontend, PVA includes a React web app (`web/`) that produces the exact same `config.json` and uploads it to the same GCS bucket. Both frontends coexist — the backend doesn't know or care which one uploaded the config.
+
+### Web App Prerequisites
+
+- Node.js >= 20
+- A Firebase project (can reuse the existing GCP project `adg-internal-tech-sandbox`)
+- Firebase CLI: `npm install -g firebase-tools`
+
+### Web App Setup
+
+#### 1. Firebase Project Configuration
+
+```bash
+cd web
+firebase login
+```
+
+If you need to create Firebase services (Auth, Firestore, Hosting) on the existing GCP project, run:
+
+```bash
+firebase init
+```
+
+and select **Firestore**, **Hosting** (use `dist` as the public directory, configure as SPA), and **Functions**. Or use the existing `firebase.json` already in the `web/` directory.
+
+Enable **Google sign-in** as an authentication provider in the [Firebase Console](https://console.firebase.google.com/) under Authentication > Sign-in method.
+
+#### 2. Environment Variables
+
+Copy the example env file and fill in your Firebase project config (found in Firebase Console > Project Settings > Your apps > Web app):
+
+```bash
+cp .env.example .env
+```
+
+Fill in the values:
+
+```
+VITE_FIREBASE_API_KEY=your-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+VITE_FIREBASE_APP_ID=your-app-id
+```
+
+#### 3. Install Dependencies
+
+```bash
+npm install
+cd functions && npm install && cd ..
+```
+
+#### 4. Local Development
+
+```bash
+npm run dev
+```
+
+The app runs at `http://localhost:5173`. Sign in with Google, then create or edit configs using the tabbed editor.
+
+#### 5. Run Tests
+
+```bash
+npm test
+```
+
+This runs 33 unit tests covering JSON generation, validation rules, and utility functions.
+
+#### 6. Deploy Cloud Function
+
+The Cloud Function `uploadConfigToGcs` acts as an authenticated proxy to write `config.json` to GCS (the browser can't write to GCS directly):
+
+```bash
+cd functions && npm run build && cd ..
+firebase deploy --only functions
+```
+
+> **Note:** The Cloud Function's service account needs write access to the GCS bucket configured in Base Config.
+
+#### 7. Deploy to Firebase Hosting
+
+```bash
+npm run build
+firebase deploy --only hosting,firestore:rules
+```
+
+#### 8. Firestore Security Rules
+
+The included `firestore.rules` ensures users can only read/write their own configs:
+
+```
+allow create: if request.auth != null;
+allow read, update, delete: if request.auth.uid == resource.data.createdBy;
+```
+
+These are deployed automatically with `firebase deploy --only firestore:rules`.
+
+### Web App Architecture
+
+```
+[Google Sheet + Apps Script]  ──┐
+                                ├──> config.json ──> GCS Bucket ──> Orchestrator ──> Runner
+[React Web App]  ───────────────┘
+```
+
+The web app's editor tabs mirror the Google Sheet tabs: Base Config, Timing, Placement, Offers (with dynamic columns), Offers to AdGroups, and AdGroups. The JSON Preview tab shows the generated config in real-time, and the Upload tab sends it to GCS via the Cloud Function.
+
+Configs are persisted in Firestore with auto-save (2-second debounce), so you can close the browser and resume later.
 
 ## Configuration
 
